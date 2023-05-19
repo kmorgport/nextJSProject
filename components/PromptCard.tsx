@@ -1,7 +1,53 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
+import { Dispatch, SetStateAction } from 'react'
+import { Session } from "next-auth";
+import { useSession } from 'next-auth/react'
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-const PromptCard = ({post, handleTagClick, handleEdit, handleDelete}) => {
+interface IUser {
+  id: string;
+  email: string;
+  username: string;
+  image: string;
+}
+
+interface ExtendedSession extends Session {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    id: string;
+  };
+}
+// interface PostType {
+//   post: string;
+//   prompt: string;
+//   creator: IUser;
+//   tag: string;
+// }
+interface PostType {
+  _id: number;
+  post: string;
+  prompt: string;
+  creator: IUser;
+  tag: string;
+}
+
+interface PromptProps {
+  key: number;
+  post: PostType;
+  handleTagClick: (e: string) => void;
+  handleEdit: (e: React.FormEvent) => void;
+  handleDelete: (e: React.FormEvent) => void;
+}
+
+const PromptCard: React.FC<PromptProps> = ({key, post, handleTagClick, handleEdit, handleDelete}) => {
+  const { data: session } = useSession()
+  const userId = (session as unknown as ExtendedSession)?.user.id;
+  const pathName = usePathname()
+  const router = useRouter()
   const [copied, setCopied] = useState("");
   const handleCopy = () => {
     setCopied(post.prompt);
@@ -45,6 +91,22 @@ const PromptCard = ({post, handleTagClick, handleEdit, handleDelete}) => {
       <p className="my-4 font-satoshi text-sm text-sm text-gray-700">{post.prompt}</p>
       <p className="font-inter text-sm blue_gradient cursor-pointer"
       onClick={()=> handleTagClick && handleTagClick(post.tag)}>#{post.tag}</p>
+      {userId === post.creator.id && pathName === '/profile' && (
+        <div className="mt-5 flex-center gap-4 border-t border-gray-100 pt-3">
+          <p
+            className="font-inner text-sm green_gradient cursor-pointer"
+            onClick={handleEdit}
+          >
+            Edit
+          </p>
+          <p
+            className="font-inner text-sm orange_gradient cursor-pointer"
+            onClick={handleDelete}
+          >
+            Delete
+          </p>
+        </div>
+      )}
     </div>
   )
 }
