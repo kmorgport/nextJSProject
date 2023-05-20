@@ -39,35 +39,36 @@ const EditPrompt = () => {
       tag: ''
     })
 
-    // const createPrompt = async (e:any) => {
-    //   e.preventDefault()
-    //   setSubmitting(true)
-    //   try{
-    //     const response = await fetch('api/prompt/new', 
-    //     {
-    //       method: 'POST',
-    //       body: JSON.stringify({
-    //         prompt: post. prompt,
-    //         userId: userId,
-    //         tag: post.tag
-    //       })
-    //     })
-    //     if(response.ok){
-    //       router.push('/')
-    //     }
-    //   }catch(error){
+    const updatePrompt = async (e:any) => {
+      e.preventDefault()
+      setSubmitting(true)
 
-    //   } finally {
-    //     setSubmitting(false)
-    //   }
-    // }
+      if(!promptId) return alert("Missing Prompt ID")
+      try{
+        const response = await fetch(`api/prompt/${promptId}`, 
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            prompt: post. prompt,
+            tag: post.tag
+          })
+        })
+        if(response.ok){
+          router.push('/')
+        }
+      }catch(error){
+
+      } finally {
+        setSubmitting(false)
+      }
+    }
   return (
     <Form
       type="Create"
       post={post}
       setPost={setPost}
       submitting={submitting}
-      handleSubmit={()=>{}}
+      handleSubmit={updatePrompt}
     />
   )
 }
